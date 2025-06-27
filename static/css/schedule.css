@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+/* === 全体設定 === */
+body {
+	font-family: 'Fredoka One', cursive;
+	background-color: #c8e6c9;
+	/* 薄い緑（とても明るい） */
+	background-size: cover;
+	color: #333;
+	padding: 30px 40px;
+}
+
+/* === 見出し === */
+h2,
+h3 {
+	color: #ffcc00;
+	text-shadow: 2px 2px #000;
+	margin-bottom: 20px;
+	background-color: rgba(255, 255, 255, 0.7);
+	padding: 8px 16px;
+	border-radius: 12px;
+	display: inline-block;
+}
+
+/* === エラーメッセージ === */
+.error-message {
+	color: #d32f2f;
+	background-color: #ffebee;
+	border-left: 8px solid #e53935;
+	padding: 10px;
+	margin-bottom: 15px;
+	border-radius: 8px;
+}
+
+/* === フォーム領域 === */
+.form-section {
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 20px;
+	border-radius: 16px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	max-width: 600px;
+	margin-bottom: 30px;
+}
+
+.form-section label {
+	display: block;
+	margin-top: 12px;
+	font-weight: bold;
+	color: #0288d1;
+}
+
+.form-section input[type="text"],
+.form-section input[type="date"],
+.form-section select {
+	width: 100%;
+	padding: 10px;
+	margin-top: 4px;
+	border-radius: 10px;
+	border: 2px solid #ffcc80;
+	font-size: 1rem;
+	background-color: #fffde7;
+	box-shadow: 2px 2px 0 #ccc;
+}
+
+.form-section button {
+	margin-top: 20px;
+	padding: 10px 20px;
+	background-color: #ff5252;
+	color: white;
+	border: none;
+	border-radius: 10px;
+	font-size: 1rem;
+	cursor: pointer;
+	box-shadow: 2px 2px 0 #c62828;
+	transition: transform 0.2s;
+}
+
+.form-section button:hover {
+	transform: scale(1.05);
+	background-color: #e53935;
+}
+
+/* === スケジュール一覧テーブル === */
+.task-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0 10px;
+	margin-top: 20px;
+	font-size: 0.9rem !important;
+}
+
+.task-table th {
+	background-color: #f57c00;
+	color: white;
+	padding: 12px;
+	border-radius: 12px 12px 0 0;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.task-table td {
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 12px;
+	border-radius: 0 0 12px 12px;
+	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	font-size: inherit !important; /* ここをinheritに */
+}
+
+/* === ナビゲーションボタン === */
+.navigation {
+	margin-top: 30px;
+	text-align: center;
+}
+
+.navigation button {
+	padding: 12px 24px;
+	background: linear-gradient(to bottom, #81c784, #388e3c);
+	color: white;
+	border: none;
+	border-radius: 12px;
+	cursor: pointer;
+	font-size: 1rem;
+	box-shadow: 3px 3px 0 #2e7d32;
+}
+
+.navigation button:hover {
+	transform: scale(1.05);
+}
+
+.delete-button {
+	background-color: #ff5252;
+	color: white;
+	border: none;
+	border-radius: 10px;
+	padding: 8px 14px;
+	cursor: pointer;
+	box-shadow: 2px 2px 0 #c62828;
+	transition: transform 0.2s;
+}
+
+.delete-button:hover {
+	background-color: #e53935;
+	transform: scale(1.05);
+}
+
+/* 編集ボタンにも専用クラスを付けたい場合 */
+.edit-button {
+	background-color: #4fc3f7;
+	color: white;
+	border: none;
+	border-radius: 10px;
+	padding: 8px 14px;
+	cursor: pointer;
+	box-shadow: 2px 2px 0 #0288d1;
+	transition: transform 0.2s;
+}
+
+.edit-button:hover {
+	background-color: #0288d1;
+	transform: scale(1.05);
+}
+
+/* フォントサイズ切り替え用クラス */
+body.small-font {
+  font-size: 12px !important;
+}
+body.medium-font {
+  font-size: 16px !important;
+}
+body.large-font {
+  font-size: 20px !important;
+}
+
+/* 他の要素は必ずbodyから継承 */
+body.small-font table,
+body.small-font th,
+body.small-font td,
+body.small-font h1,
+body.small-font h2,
+body.small-font label,
+body.small-font button,
+body.small-font select,
+body.small-font input {
+  font-size: 12px !important;
+}
+
+body.medium-font table,
+body.medium-font th,
+body.medium-font td,
+body.medium-font h1,
+body.medium-font h2,
+body.medium-font label,
+body.medium-font button,
+body.medium-font select,
+body.medium-font input {
+  font-size: 16px !important;
+}
+
+body.large-font table,
+body.large-font th,
+body.large-font td,
+body.large-font h1,
+body.large-font h2,
+body.large-font label,
+body.large-font button,
+body.large-font select,
+body.large-font input {
+  font-size: 20px !important;
+}
+

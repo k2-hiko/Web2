@@ -1,0 +1,90 @@
+/* === 背景・全体フォント + 垂直中央揃え用 === */
+body {
+	font-family: 'Segoe UI', sans-serif;
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-image: url('/images/mario.png');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	color: #e74c3c; /* ← マリオの赤系に変更 */
+}
+
+/* === 半透明の白ボックス（透け感強め） === */
+body > *:not(header) {
+	background-color: rgba(255, 255, 255, 0.6);
+	padding: 2rem;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	max-width: 500px;
+	width: 90%;
+	box-sizing: border-box;
+}
+
+/* === タイトル === */
+h1,
+h2 {
+	color: #e74c3c; /* マリオ帽子カラー */
+	margin-top: 0;
+	text-align: center;
+	text-shadow: 1px 1px #000; /* ドットゲームっぽい影 */
+}
+
+/* === 入力共通化 === */
+input[type="text"],
+input[type="password"] {
+	width: 100%;
+	padding: 0.6rem;
+	margin-top: 0.3rem;
+	margin-bottom: 1rem;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: rgba(255,255,255,0.8);
+}
+
+/* === ボタンデザイン === */
+button {
+	padding: 0.6rem 1rem;
+	background-color: #27ae60; /* 緑土管カラー */
+	color: #fff;
+	border: 3px solid #2ecc71;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-family: 'Press Start 2P', cursive;
+	font-size: 0.8rem;
+	box-shadow: 0 4px #1e8449;
+}
+
+button:hover {
+	background-color: #2ecc71;
+	transform: translateY(-2px); /* ジャンプ感 */
+	box-shadow: 0 6px #1e8449;
+}
+
+/* === メッセージ表示 === */
+.text-danger {
+	color: #d32f2f;
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+/* === レスポンシブ対応 === */
+@media (max-width: 768px) {
+	body {
+		padding: 1rem;
+	}
+
+	input,
+	button {
+		font-size: 0.95rem;
+	}
+
+	button {
+		width: 100%;
+	}
+}

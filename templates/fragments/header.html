@@ -1,0 +1,82 @@
+<div th:fragment="header">
+  <header style="
+    background: linear-gradient(to right, #81d4fa, #a5d6a7);
+    padding: 16px 32px;
+    border-bottom: 4px solid #43a047;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-image: url('/images/clouds_strip.png');
+    background-repeat: repeat-x;
+  ">
+    <!-- タイトル -->
+    <div style="
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ffcc00;
+      text-shadow: 2px 2px #000;
+      font-family: 'Fredoka One', cursive;
+    ">
+      IQOS進捗管理
+    </div>
+
+    <!-- ログアウトボタン -->
+    <form id="logoutForm" th:action="@{/logout}" method="post" style="margin: 0;">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <button type="submit" id="logoutButton" style="
+        background-color: #ff5252;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 2px 2px 0 #c62828;
+        transition: 0.2s;
+        font-family: 'Fredoka One', cursive;
+      " onmouseover="this.style.backgroundColor='#e53935'" onmouseout="this.style.backgroundColor='#ff5252'">
+        ログアウト
+      </button>
+    </form>
+
+    <!-- BGM 自動再生・ループ -->
+    <audio id="bgm" autoplay loop preload="auto" th:src="@{/sound/BGM.mp3}"></audio>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ログアウト時の効果音処理
+        const logoutBtn = document.getElementById("logoutButton");
+        const logoutForm = document.getElementById("logoutForm");
+
+        if (logoutBtn && logoutForm) {
+          logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault(); // フォーム送信を一旦停止
+
+            const sound = new Audio("/sound/10-mario-died.mp3");
+            sound.preload = "auto";
+            sound.play().catch(() => logoutForm.submit());
+
+            setTimeout(() => logoutForm.submit(), 2000);
+          });
+        }
+
+        // BGMの再生制御（モバイルの自動再生制限対策含む）
+        const bgm = document.getElementById("bgm");
+        if (bgm) {
+          bgm.volume = 0.01; // 音量調整
+
+          // ユーザー操作で再生許可（モバイル対策）
+          document.body.addEventListener("click", () => {
+            if (bgm.paused) {
+              bgm.play().catch(e => console.warn("BGM再生失敗:", e));
+            }
+          }, { once: true });
+
+          // 初回再生試み
+          bgm.play().catch(e => console.warn("自動再生が制限されている:", e));
+        }
+      });
+    </script>
+  </header>
+</div>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>タスク進捗管理</title>
+	<link rel="stylesheet" th:href="@{/css/member.css}" />
+</head>
+
+<body th:classappend="${backgroundBase64} ? 'custom-background'"
+	th:style="${backgroundBase64} ? 'background-image: url(data:' + ${backgroundImageType} + ';base64,' + ${backgroundBase64} + ');' : ''">
+
+	<div th:replace="fragments/header :: header"></div>
+
+	<h1>タスク進捗管理</h1>
+
+	<!-- 🔔 アップロード結果のメッセージ表示 -->
+	<div th:if="${success != null}" class="alert alert-success" style="margin: 10px 0;">
+		<p th:text="${success}"></p>
+	</div>
+	<div th:if="${error != null}" class="alert alert-danger" style="margin: 10px 0;">
+		<p th:text="${error}"></p>
+	</div>
+
+	<label for="fontSizeSelector">文字サイズ:</label>
+	<select id="fontSizeSelector">
+		<option value="small">小</option>
+		<option value="medium" selected>中</option>
+		<option value="large">大</option>
+	</select>
+
+	<!-- 背景画像アップロード -->
+	<form th:action="@{/member/upload-background}" method="post" enctype="multipart/form-data"
+		style="margin-bottom: 20px;">
+		<p style="color: #666; font-size: 0.9em;">
+			※ 背景画像は <strong>5MB 以下</strong>、<strong>JPEG / PNG</strong> 形式のみアップロード可能です。
+		</p>
+		<label>背景画像を選択:
+			<input type="file" name="backgroundImage" accept="image/jpeg,image/png" required />
+		</label>
+		<button type="submit">アップロード</button>
+	</form>
+
+	<div class="section-title" th:text="'【' + ${loginUserName} + '】のタスク'"></div>
+	<form th:action="@{/member}" method="post">
+		<button type="button" id="save-button">保存</button>
+		<table>
+			<thead>
+				<tr>
+					<th>プロジェクト</th>
+					<th>タスク名</th>
+					<th>開始日</th> <!-- 変更 -->
+					<th>終了日</th> <!-- 追加 -->
+					<th>担当者</th>
+					<th>ステータス</th>
+					<th>進捗率</th>
+					<th>備考</th>
+					<th>リーダからのメッセージ</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="task : ${myTasks}">
+					<td th:text="${task.project.projectName}"></td>
+					<td th:text="${task.taskName}"></td>
+					<td th:text="${task.startDate}"></td> <!-- 開始日 -->
+					<td th:text="${task.endDate}"></td> <!-- 終了日 -->
+					<td th:text="${task.user.name}"></td>
+					<td>
+						<select th:name="'status_' + ${task.taskId}" th:onchange="updateProgressBar(this)">
+							<option th:each="status : ${statusList}" th:value="${status}" th:text="${status}"
+								th:selected="${status == task.status}"></option>
+						</select>
+					</td>
+					<td>
+						<div class="progress-bar">
+							<div class="progress" th:id="'progress-' + ${task.taskId}"
+								th:style="'width:' + ${task.progress} + '%'" th:text="${task.progress} + '%'">
+							</div>
+						</div>
+					</td>
+					<td th:text="${task.description} ?: ''"></td>
+					<td class="alert-cell" th:text="${taskAlerts[task.taskId]} ?: ''"></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+
+	<div class="section-title">他の方のタスク</div>
+	<div class="controls">
+		<label>プロジェクト:
+			<select id="others-project-select" onchange="filterOthersTasks()">
+				<option value="">全て</option>
+				<option th:each="project : ${projects}" th:value="${project.projectId}" th:text="${project.projectName}"
+					th:selected="${project.projectId == selectedProjectId}"></option>
+			</select>
+		</label>
+		<label>ユーザー:
+			<select id="others-user-select" onchange="filterOthersTasks()">
+				<option value="">全て</option>
+				<option th:each="otherUser : ${users}" th:value="${otherUser.userId}" th:text="${otherUser.name}"
+					th:selected="${otherUser.userId == selectedUserId}"></option>
+			</select>
+		</label>
+	</div>
+
+	<table>
+		<thead>
+			<tr>
+				<th>プロジェクト</th>
+				<th>タスク名</th>
+				<th>開始日</th> <!-- 変更 -->
+				<th>終了日</th> <!-- 追加 -->
+				<th>担当者</th>
+				<th>ステータス</th>
+				<th>進捗率</th>
+				<th>備考</th>
+				<th>リーダからのメッセージ</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="otherTask : ${otherTasks}">
+				<td th:text="${otherTask.project.projectName}"></td>
+				<td th:text="${otherTask.taskName}"></td>
+				<td th:text="${otherTask.startDate}"></td> <!-- 開始日 -->
+				<td th:text="${otherTask.endDate}"></td> <!-- 終了日 -->
+				<td th:text="${otherTask.user.name}"></td>
+				<td th:text="${otherTask.status}"></td>
+				<td>
+					<div class="progress-bar">
+						<div class="progress" th:style="'width:' + ${otherTask.progress} + '%'"
+							th:text="${otherTask.progress} + '%'">
+						</div>
+					</div>
+				</td>
+				<td th:text="${otherTask.description} ?: ''"></td>
+				<td class="alert-cell" th:text="${taskAlerts[otherTask.taskId]} ?: ''"></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<script>
+		const statusToProgress = {
+			"未着手": 0,
+			"着手": 30,
+			"進行中": 60,
+			"レビュー待ち": 90,
+			"完了": 100
+		};
+
+		function updateProgressBar(selectElem) {
+			const taskId = selectElem.name.substring(7);
+			const progressDiv = document.getElementById('progress-' + taskId);
+			const status = selectElem.value;
+			const progressValue = statusToProgress[status] || 0;
+			progressDiv.style.width = progressValue + '%';
+			progressDiv.textContent = progressValue + '%';
+		}
+
+		function filterOthersTasks() {
+			const projectId = document.getElementById('others-project-select').value;
+			const userId = document.getElementById('others-user-select').value;
+			let query = '?';
+			if (projectId) query += 'projectId=' + encodeURIComponent(projectId) + '&';
+			if (userId) query += 'userId=' + encodeURIComponent(userId);
+			window.location.href = '/member' + query;
+		}
+
+		document.addEventListener("DOMContentLoaded", () => {
+			const saveButton = document.getElementById("save-button");
+			const form = document.querySelector('form[action="/member"]');
+
+			if (saveButton && form) {
+				saveButton.addEventListener("click", () => {
+					const sound = new Audio("/sound/coin.mp3");
+					sound.preload = "auto";
+
+					sound.play().catch(err => {
+						console.warn("保存音が再生できませんでした:", err);
+						form.submit();
+						return;
+					});
+
+					setTimeout(() => {
+						form.submit();
+					}, 800);
+				});
+			}
+
+			const fontSelector = document.getElementById('fontSizeSelector');
+			if (!fontSelector) return;
+
+			const savedSize = localStorage.getItem('preferredFontSize') || 'medium';
+			document.body.classList.add(savedSize + '-font');
+			fontSelector.value = savedSize;
+
+			fontSelector.addEventListener('change', function () {
+				document.body.classList.remove('small-font', 'medium-font', 'large-font');
+				document.body.classList.add(this.value + '-font');
+				localStorage.setItem('preferredFontSize', this.value);
+			});
+		});
+	</script>
+
+</body>
+
+</html>

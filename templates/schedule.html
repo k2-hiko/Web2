@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>スケジュール作成</title>
+	<!-- CSS読み込み -->
+	<link rel="stylesheet" th:href="@{/css/schedule.css}" />
+	<style>
+		body.small-font {
+			font-size: 12px !important;
+		}
+
+		body.medium-font {
+			font-size: 16px !important;
+		}
+
+		body.large-font {
+			font-size: 20px !important;
+		}
+
+		table, th, td, h1, h2, label, button, select, input {
+			font-size: inherit !important;
+		}
+
+		select#fontSizeSelector {
+			margin-bottom: 1rem;
+		}
+	</style>
+</head>
+
+<body id="pageBody">
+	<!-- 共通ヘッダーの読み込み -->
+	<div th:replace="fragments/header :: header"></div>
+
+	<h2>スケジュール作成</h2>
+	<label for="fontSizeSelector">文字サイズ:</label>
+	<select id="fontSizeSelector">
+		<option value="small">小</option>
+		<option value="medium" selected>中</option>
+		<option value="large">大</option>
+	</select>
+
+	<!-- エラーメッセージ表示（存在する場合のみ） -->
+	<div th:if="${errorMessage != null}" class="error-message">
+		<p th:text="${errorMessage}"></p>
+	</div>
+
+	<!-- スケジュール登録・更新フォーム -->
+	<form th:action="@{/schedule/add}" method="post" th:object="${taskForm}" class="form-section">
+		<!-- タスクID（更新時に使用） -->
+		<input type="hidden" th:field="*{taskId}">
+		<!-- 編集フラグ -->
+		<input type="hidden" name="isEditing" th:value="${isEditing}" />
+
+		<!-- プロジェクト名入力 -->
+		<label>プロジェクト名：</label>
+		<input type="text" name="projectName" th:value="${projectName}" required>
+
+		<!-- 担当メンバー選択 -->
+		<label>担当メンバー：</label>
+		<select name="userId" required>
+			<option value="">選択してください</option>
+			<!-- メンバー一覧をループ表示 -->
+			<option th:each="member : ${memberList}" th:value="${member.userId}" th:text="${member.userName}"
+				th:selected="${taskForm.user?.userId == member.userId}">
+			</option>
+		</select>
+
+		<!-- タスク名入力 -->
+		<label>タスク名：</label>
+		<input type="text" th:field="*{taskName}" required>
+
+		<!-- 開始日入力 -->
+		<label>開始日：</label>
+		<input type="date" th:field="*{startDate}" required>
+
+		<!-- 終了日入力 -->
+		<label>終了日：</label>
+		<input type="date" th:field="*{endDate}" required>
+
+		<!-- 備考入力 -->
+		<label>備考：</label>
+		<input type="text" th:field="*{description}">
+
+		<!-- 追加または更新ボタン（動的に切替） -->
+		<button type="submit" th:text="${isEditing} ? '更新' : '追加'"></button>
+	</form>
+
+	<hr>
+
+	<!-- 登録済みスケジュール一覧 -->
+	<h3>スケジュール一覧</h3>
+
+	<table class="task-table">
+		<thead>
+			<tr>
+				<th>プロジェクト</th>
+				<th>タスク名</th>
+				<th>担当者</th>
+				<th>開始日</th>
+				<th>終了日</th>
+				<th>備考</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- タスク一覧をループ表示 -->
+			<tr th:each="task : ${taskList}">
+				<td th:text="${task.project.projectName}"></td>
+				<td th:text="${task.taskName}"></td>
+				<td th:text="${task.user.userName}"></td>
+				<td th:text="${task.startDate}"></td>
+				<td th:text="${task.endDate}"></td>
+				<td th:text="${task.description}"></td>
+				<td>
+					<!-- 編集ボタン -->
+					<form th:action="@{/schedule/edit}" method="post" style="display:inline;">
+						<input type="hidden" name="taskId" th:value="${task.taskId}">
+						<button class="edit-button" type="submit">編集</button>
+					</form>
+					<!-- 削除ボタン -->
+					<form th:action="@{/schedule/delete}" method="post" style="display:inline;">
+						<input type="hidden" name="taskId" th:value="${task.taskId}">
+						<button class="delete-button" type="submit">削除</button>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- リーダー管理画面への遷移ボタン -->
+	<div class="navigation">
+		<form th:action="@{/leader/dashboard}" method="get">
+			<button type="submit">リーダー管理画面へ</button>
+		</form>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const fontSelector = document.getElementById('fontSizeSelector');
+			if (!fontSelector) return;
+
+			// 保存されたフォントサイズを適用
+			const savedSize = localStorage.getItem('preferredFontSize') || 'medium';
+			document.body.classList.add(savedSize + '-font');
+			fontSelector.value = savedSize;
+
+			fontSelector.addEventListener('change', function () {
+				document.body.classList.remove('small-font', 'medium-font', 'large-font');
+				document.body.classList.add(this.value + '-font');
+				localStorage.setItem('preferredFontSize', this.value);
+			});
+		});
+	</script>
+</body>
+
+</html>
